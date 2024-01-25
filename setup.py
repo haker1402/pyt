@@ -1,41 +1,67 @@
-from setuptools import setup
+import pygame
+import sys
+import random
 
-long_description = """"""
+# Initialisation de Pygame
+pygame.init()
 
-setup(
-    name='pyt',
-    version='1.0.0a20 ',
-    description='Find security vulnerabilities in Python web applications'
-    ' using static analysis.',
-    long_description=long_description,
-    url='https://github.com/python-security/pyt',
-    author='python-security',
-    author_email='mr.thalmann@gmail.com',
-    license='GPLv2',
-    classifiers=[
-        'Development Status :: 3 - Alpha',
-        'Intended Audience :: Developers',
-        'Intended Audience :: Science/Research',
-        'Topic :: Security',
-        'Topic :: Software Development',
-        'Topic :: Scientific/Engineering',
-        'Topic :: Utilities',
-        'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
-        'Programming Language :: Python :: 3.5'
-    ],
-    keywords='security vulnerability web flask django pyt static analysis',
-    packages=[
-        'pyt'
-    ],
-    install_requres=[
-        'graphviz==0.4.10',
-        'requests==2.10.0',
-        'GitPython==2.0.8'
-    ],
-    include_package_data=True,
-    entry_points={
-        'console_scripts': [
-            'pyt = pyt:main'
-        ]
-    }
-)
+# Définition des constantes
+WIDTH, HEIGHT = 800, 600
+FPS = 60
+
+# Couleurs
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+
+# Création de la fenêtre du jeu
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Simple Game")
+
+# Création du joueur
+player = pygame.Rect(WIDTH // 2 - 25, HEIGHT - 50, 50, 50)
+
+# Création de l'ennemi
+enemy = pygame.Rect(random.randint(0, WIDTH - 50), 0, 50, 50)
+enemy_speed = 5
+
+# Clock pour définir le FPS
+clock = pygame.time.Clock()
+
+# Boucle principale du jeu
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    # Mouvement du joueur
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT] and player.x > 0:
+        player.x -= 5
+    if keys[pygame.K_RIGHT] and player.x < WIDTH - 50:
+        player.x += 5
+
+    # Mouvement de l'ennemi
+    enemy.y += enemy_speed
+    if enemy.y > HEIGHT:
+        enemy.y = 0
+        enemy.x = random.randint(0, WIDTH - 50)
+
+    # Collision entre joueur et ennemi
+    if player.colliderect(enemy):
+        print("Game Over!")
+        pygame.quit()
+        sys.exit()
+
+    # Effacer l'écran
+    screen.fill(WHITE)
+
+    # Dessiner le joueur et l'ennemi
+    pygame.draw.rect(screen, RED, player)
+    pygame.draw.rect(screen, WHITE, enemy)
+
+    # Mettre à jour l'affichage
+    pygame.display.flip()
+
+    # Limiter le nombre d'images par seconde
+    clock.tick(FPS)
